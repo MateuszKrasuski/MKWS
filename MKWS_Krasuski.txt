@@ -1,0 +1,375 @@
+\documentclass[12pt,a4paper]{article}
+
+\setlength{\parindent}{35pt}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{chngcntr}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{subfig}
+\newgeometry{tmargin=2.5cm, bmargin=2.5cm, lmargin=3.5cm, rmargin=2.5cm}
+\usepackage[justification=centering]{caption}
+\setcounter{secnumdepth}{4}
+\usepackage[subfigure]{tocloft}
+\usepackage{url}
+\usepackage{lscape}
+\usepackage{fancyhdr}
+\usepackage{pdfpages}
+\usepackage{pdflscape}
+\usepackage{makecell}
+\usepackage[framed,numbered]{matlab-prettifier}
+\usepackage{listingsutf8}
+\usepackage{listings}
+
+\counterwithin{table}{section}
+\counterwithin{figure}{section}
+\counterwithin{equation}{section}
+
+\begin{document}
+\pagestyle{fancy}
+\fancyhead[L,R]{}
+\fancyhead[C]{}
+\cfoot{
+\hrule \vspace{0.25cm}Computer Methods in Combustion \vspace{0.2cm} Page \thepage \hspace{1pt} of 12}
+
+\thispagestyle{empty}
+\begin{flushright}
+{\large Mateusz Krasuski, 299126\\}
+\end{flushright}
+\begin{center}
+	\vspace*{5.5cm}
+	\textbf{{\Large Warsaw University of Technology\\}
+		\vspace*{0.3cm}
+		{\large Faculty of Power and Aeronautical Engineering\\}}
+	\vspace{2cm}
+	\textsc{\textbf{{\LARGE Computer Methods in Combustion\\}}}
+	\vspace{1.5cm}
+	{\Large \textbf{Determination of the maximum impulse and combustion temperature for various types of fuels in liquid rocket engine\\}}
+	\vspace{6cm}
+	{\large Warsaw 02.06.2020}
+\end{center}
+
+\newpage
+\tableofcontents
+
+
+\newpage
+\section{Introduction}
+The project presents a comparison of two approaches on calculating the specific impulse and the temperature in the combustion chamber for the SpaceX's Raptor liquid rocket engine. Two programs were used, MATLAB with the Cantera program and NASA CEA, both are based on the same chemical equations. However, the most important difference between them is the degree of simplyfication of reactions. 
+
+\section{Models}
+
+\subsection{Engine parameters}
+The calculations were performed for the Raptor engine model from SpaceX. Few parameters of this particular engine are presented in Table 2.1. Some of the needed data was not available and had to be assumed.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parameter}                    & \textbf{Value} \\ \hline
+Pressure at the nozzle exit {[}atm{]} & 1              \\ \hline
+Pressure combustion chamber {[}atm{]} & 296.1          \\ \hline
+Nozzle ratio {[}-{]}                  & 40             \\ \hline
+Assumed propellant temperature {[}K{]}                  & 273             \\ \hline
+\end{tabular}
+\caption{Engine parameters.}
+\end{center}
+\end{table}
+
+
+\subsection{Oxidizer}
+Oxygen was used as an oxidizer, its most important properties (from this project's point of view) are summarized in Table 2.2.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parameter}                    & \textbf{Value} \\ \hline
+Name {[}-{]} & Oxygen              \\ \hline
+Formula {[}-{]} & $O_2$          \\ \hline
+Mollar weight {[}$\frac{g}{mol}${]}                  & 16,04             \\ \hline
+\end{tabular}
+\caption{Methane properties.}
+\end{center}
+\end{table}
+
+\newpage
+
+\subsection{Fuel}
+The analysis were carried out for two different fuels, common in aerospace: methane and hydrogen. Some of their properties are summarized in Table 2.3 and Table 2.4.
+\\
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parameter}                    & \textbf{Value} \\ \hline
+Name {[}-{]} & Methane              \\ \hline
+Formula {[}-{]} & $CH_4$          \\ \hline
+Mollar weight {[}$\frac{g}{mol}${]}                  & 16,04             \\\hline \end{tabular}
+\caption{Methane properties.}
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parameter}                    & \textbf{Value} \\ \hline
+Name {[}-{]} & Hydrogen              \\ \hline
+Formula {[}-{]} & $H_2$          \\ \hline
+Mollar weight {[}$\frac{g}{mol}${]}                  & 2,02            \\ \hline
+\end{tabular}
+\caption{Hydrogen properties.}
+\end{center}
+\end{table}
+
+\subsection{NASA CEA model}
+The NASA Computer program CEA (Chemical Equilibrium with Applications) calculates chemical equilibrium compositions and properties of complex mixtures. Applications include assigned thermodynamic states, theoretical rocket performance, Chapman-Jouguet detonation parameters, shock tube parameters, and combustion properties. Chemical equations used in the NASA CEA program are partly analogous to the equations used in the program created in Cantera. However, there is no need to enter them because the program is based on its own library with properties of many materials. Calculations were conducted for Rocket (rkt) case, infinite combustion chamber area and 16 different O/F ratios (all of which were entered by the user). After choosing materials and assigning their temperature a simulation was carried out. Results from this simulation (temperature, gamma and molar weight in the chamber) were then exported to a text file. CEA calculates Isp as well, but formula for that is unknown and thus it cannot be used for comparison.
+
+\subsection{Cantera model}
+Cantera is one of chemical kinetics software which can be used to compute variety of reactions from thermodynamical point of view, including combustion. User needs to either choose one of the reactant from Cantera's library or enter precalculated formulas for every reactant and product factor. Having given this data, Cantera can further calculate reaction parameters, for instance, temperature or molar weight. Those parameters can be used to determine specific impulse. In this project, Cantera is operated using MATLAB and special toolbox. These things combined allow to write MATLAB code interpreted and ran in Python and to analyse results. Separate program was written for each case (H2 and CH4). In both programs at the beggining user needs to enter some input data, then combustion reactants are specified (in this case, all of them were imported from Cantera's library). After that, arrays are initialized. At this point, user needs to enter O/F ratios for which calculations will be performed (it is done by entering minimum O/F ratio and number of points (interval between them is constant and equal to minimum O/F ratio). Having done that, program can perform simulations and calculate equilibrium with all parameters needed for further calculations.  Specific impulse is determined using following equation:
+
+\begin{equation}
+Isp_{theor}=\sqrt{\frac{T*R}{M'}*\frac{2*\gamma}{\gamma-1}*[1-(\frac{p_{exit}}{p_{chamber}})^\frac{\gamma-1}{\gamma}]}
+\end{equation}
+
+\begin{itemize}
+\item $T$ - Adiabatic combustion chamber temperature
+\item $R$ - Universal gas constant
+\item $M$ - Molar weight
+\item $\gamma$ - Heat capacity ratio
+\item $p_{exit}$ - Pressure at the nozzle exit (in this case ambient pressure)
+\item $p_{chamber}$ - Combustion chamber pressure
+\end{itemize}
+
+Software then reads data from CEA simulations and calculates Isp using equation (2.1). At the end Isp and adiabatic temperature are presented on graph.
+
+\section{Results}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{CH4.png}
+\caption{Methane oxygen combustion.}
+\label{fig:CH4}
+\end{figure}
+
+Graphs for both cases are rather simmilar. CEA gives higher Isp and T than Cantera. It also reaches maximum for higher O/F ratio. It is important to notice, that real life results are somewhere between those two methods. Isp of the Raptor engine is equal around 330 s for 3.55 O/F ratio which is almost in the middle between CEA's and Cantera's results. It is also worth to mention, that for a small O/F ratio range (1.75-2), both methods give almost identical results.
+
+\subsection{Hydrogen}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{H2.png}
+\caption{Hydrogen oxygen combustio.}
+\label{fig:H2}
+\end{figure}
+
+CEA again gives higher results. For low O/F ratios the difference is almost undetectable. It is not possible to compare results with any experimental data, since Raptor is not powered by hydrogen. However, Isp for hydrogen in this simulation is much higher than for methane as expected. O/F ratio for maximum Isp is also higher.
+ 
+\section{Summary}
+Not all parameters of chamber are used in Cantera, that might cause differences in way software sees the place of combustion, which might have slight impact on results. Both Cantera and NASA CEA are different softwares so they might have different attitude to same issues. 
+Another thing that may cause differences are collections of data. NASA CEA is quite old software, the last update was 15 years ago, where time from the latest update of Cantera is counted of months. The methods of calculations may not be changed drastically in perspective of years, but parameters of gases and substances used in combustion may vary as there are new researches still made. 
+In case of temperatures, MATLAB program written to use Cantera has the 100K range of accuracy (later changed to 50 kelvins). This draws attention on the fact, that programs are not exactly accurate, both have different outcomes than reality, the sum of these might be significant.
+Another reason of differences might be the degree of simplification of equations and processes during combustion. Cantera takes into account problem of inadequate ammount of oxidiser, but does not consider temporary conditions and grading of the reaction (i.e. temporary existing of OH- in combustion of carbohydrates).
+All these factors may not cause much difference separately, but combined might be the reason of such gaps in values during calculations in project. 
+
+\section{Sources}
+\begin{itemize}
+\item https://en.wikipedia.org/wiki/SpaceX$\_$Raptor
+\item https://github.com/OlaMochol/MKWS$\_$Siemionek$\_$Mochol$\_$2020
+\item Rocket propulsion elements, George P. Sutton and Oscar Biblarz, ninth edition, Wiley, 2017
+\end{itemize}
+
+\newpage
+
+\section*{Code - Hydrogen}
+\begin{lstlisting}
+function hydrogen_oxygen_combustion(g)
+
+%Hydrogen and oxygen combustion
+%Mateusz Krasuski
+%MKWS 2021 r.
+
+
+%input data
+oneatm = 100000; %ambient pressure [bar];
+p_cham=296.1*oneatm; %chamber pressure [atm];
+T0=273; %initial temperature [K];
+p_e=oneatm; %pressure at the nozzle exit [atm];
+M_ful=2; % fuel molecular mass [g/mol];
+M_ox=32.0; % oxidizer molecular mass [g/mol];
+R=8314.46; %universal gas constant [J/(kmol*K)];
+gravity=9.81; %gravity constant;
+
+
+%finding methane and oxygen indices
+gas = Solution('gri30.yaml');
+nsp = nSpecies(gas);
+ih2 = speciesIndex(gas,'H2');
+io2  = speciesIndex(gas,'O2');
+
+%calculations are conducted for nO_F different O/F ratios
+%beggining at o_f_min with constant interval equal o_f_min
+nO_F = 16;
+o_f_min=0.8;
+
+%initializing arrays
+o_f = linspace(o_f_min, o_f_min*nO_F, nO_F);
+tad=zeros(nO_F,1);
+xeq(nsp,nO_F) = 0;
+M_gas=zeros(nO_F,1);
+gamma=zeros(nO_F,1);
+Isp=zeros(nO_F,1);
+Results_CEA=zeros(2*nO_F,3);
+Isp_CEA=zeros(nO_F,1);
+Temp_CEA=zeros(nO_F,1);
+
+%equilibrium and ISP calculations using Cantera 
+for i =1:1:nO_F
+   x = zeros(nsp,1);
+   x(ih2,1) = 1.0;
+   x(io2,1) = o_f(i)*M_ful/M_ox;
+   set(gas,'Temperature',T0,'Pressure',oneatm,'MoleFractions',x);
+   equilibrate(gas,'HP');
+   tad(i) = temperature(gas);
+   xeq(:,i) = moleFractions(gas);
+   M_gas(i)=meanMolecularWeight(gas);
+   gamma(i)=cp_mass(gas)/cv_mass(gas);
+   Isp(i)=sqrt(2*gamma(i)*R*tad(i)/((gamma(i)-1)*M_gas(i))*...
+   (1-(p_e/p_cham)^((gamma(i)-1)/gamma(i))));
+end
+
+%reading results from CEA - temperature, gamma and molecular weight;
+Results_CEA = readmatrix('H2_CEA_data.txt');
+for i =1:1:nO_F
+Isp_CEA(i)=sqrt(Results_CEA(2*i-1,1)*R/Results_CEA(2*i-1,2)*...
+    (2*Results_CEA(2*i-1,3))/(Results_CEA(2*i-1,3)-1)*...
+    (1-(p_e/p_cham)^((Results_CEA(2*i-1,3)-1)/Results_CEA(2*i-1,3))));
+Temp_CEA(i)=Results_CEA(2*i-1,1);
+end
+
+%making plots and printing results
+figure(1);
+subplot(1,2,1);
+plot([o_f_min:o_f_min:o_f_min*nO_F],Isp/gravity);
+hold on;
+plot([o_f_min:o_f_min:o_f_min*nO_F],Isp_CEA/gravity);
+hold off;
+grid minor;
+xlabel('Oxidizer-Fuel Ratio');
+ylabel('Specific impulse [s]');
+
+
+subplot(1,2,2);
+plot([o_f_min:o_f_min:o_f_min*nO_F],tad,'DisplayName','CANTERA');
+hold on;
+plot([o_f_min:o_f_min:o_f_min*nO_F],Temp_CEA,'DisplayName','CEA');
+hold off;
+grid minor;
+xlabel('Oxidizer-Fuel Ratio');
+ylabel('Temperature in combustion chamber [K]');
+lgd = legend;
+lgd.NumColumns = 1;
+\end{lstlisting}
+
+\newpage
+
+\section*{Code - Methane}
+\begin{lstlisting}
+function methane_oxygen_combustion(g)
+
+%Methane and oxygen combustion
+%Mateusz Krasuski
+%MKWS 2021 r.
+
+
+%input data
+oneatm = 100000; %ambient pressure [bar];
+p_cham=296.1*oneatm; %chamber pressure [atm];
+T0=273; %initial temperature [K];
+p_e=oneatm; %pressure at the nozzle exit [atm];
+M_ful=16.04; % fuel molecular mass [g/mol];
+M_ox=32.0; % oxidizer molecular mass [g/mol];
+R=8314.46; %universal gas constant [J/(kmol*K)];
+gravity=9.81; %gravity constant;
+
+
+%finding methane and oxygen indices
+gas = Solution('gri30.yaml');
+nsp = nSpecies(gas);
+ich4 = speciesIndex(gas,'CH4');
+io2  = speciesIndex(gas,'O2');
+
+%calculations are conducted for nO_F different O/F ratios
+%beggining at o_f_min with constant interval equal to o_f_min
+nO_F = 16;
+o_f_min=0.4;
+
+%initializing arrays
+o_f = linspace(o_f_min, o_f_min*nO_F, nO_F);
+tad=zeros(nO_F,1);
+xeq(nsp,nO_F) = 0;
+M_gas=zeros(nO_F,1);
+gamma=zeros(nO_F,1);
+Isp=zeros(nO_F,1);
+Results_CEA=zeros(2*nO_F,3);
+Isp_CEA=zeros(nO_F,1);
+Temp_CEA=zeros(nO_F,1);
+
+%equilibrium and ISP calculations using Cantera 
+for i =1:1:nO_F
+   x = zeros(nsp,1);
+   x(ich4,1) = 1.0;
+   x(io2,1) = o_f(i)*M_ful/M_ox;
+   set(gas,'Temperature',T0,'Pressure',oneatm,'MoleFractions',x);
+   equilibrate(gas,'HP');
+   tad(i) = temperature(gas);
+   xeq(:,i) = moleFractions(gas);
+   M_gas(i)=meanMolecularWeight(gas);
+   gamma(i)=cp_mass(gas)/cv_mass(gas);
+   Isp(i)=sqrt(2*gamma(i)*R*tad(i)/((gamma(i)-1)*M_gas(i))*...
+   (1-(p_e/p_cham)^((gamma(i)-1)/gamma(i))));
+end
+
+%reading results from CEA - temperature, gamma and molecular weight;
+Results_CEA = readmatrix('CH4_CEA_data.txt');
+for i =1:1:nO_F
+Isp_CEA(i)=sqrt(Results_CEA(2*i-1,1)*R/Results_CEA(2*i-1,2)*...
+    (2*Results_CEA(2*i-1,3))/(Results_CEA(2*i-1,3)-1)*...
+    (1-(p_e/p_cham)^((Results_CEA(2*i-1,3)-1)/Results_CEA(2*i-1,3))));
+Temp_CEA(i)=Results_CEA(2*i-1,1);
+end
+
+%making plots and printing results
+figure(1);
+subplot(1,2,1);
+plot([o_f_min:o_f_min:o_f_min*nO_F],Isp/gravity);
+hold on;
+plot([o_f_min:o_f_min:o_f_min*nO_F],Isp_CEA/gravity);
+hold off;
+grid minor;
+xlabel('Oxidizer-Fuel Ratio');
+ylabel('Specific impulse [s]');
+
+
+subplot(1,2,2);
+plot([o_f_min:o_f_min:o_f_min*nO_F],tad,'DisplayName','CANTERA');
+hold on;
+plot([o_f_min:o_f_min:o_f_min*nO_F],Temp_CEA,'DisplayName','CEA');
+hold off;
+grid minor;
+xlabel('Oxidizer-Fuel Ratio');
+ylabel('Temperature in combustion chamber [K]');
+lgd = legend;
+lgd.NumColumns = 1;
+
+\end{lstlisting}
+\end{document}

@@ -1,0 +1,9 @@
+problem    o/f=0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,
+    rocket  equilibrium  frozen  nfz=1  tcest,k=3800
+  p,atm=296.1,
+react  
+  fuel=CH4 t,k=273  
+  oxid=O2 t,k=273  
+output  
+    plot t isp 
+end
